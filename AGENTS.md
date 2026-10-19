@@ -22,6 +22,7 @@ Three routes:
 
 ## Required Conventions
 
+- **Template library**: `skills/word-master/templates/docs/` holds the packages; `templates/README.md` is the catalogue. Derive variants with `template_derive.py` (it validates the OOXML after patching); do not hand-edit `styles.xml`.
 - **Contract is truth**: `templates/docs/<name>/contract.json` is the machine authority for all style decisions; `template_contract.md` is its human-readable documentation. Keep both in sync — edit JSON first, then the doc.
 - **Source preservation**: `template_src.docx` (the ingested original) is never modified. Derivatives are new files.
 - **Numbering discipline**: heading and caption numbers come from auto-numbering fields only; below heading level 7, sequence numbers are hand-typed text per the unit convention (（1）→ 1) → ① → a)).
@@ -36,6 +37,7 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 "$PY" skills/word-master/scripts/template_manager.py list
 "$PY" skills/word-master/scripts/template_manager.py analyze <docx> --out <dir>
 "$PY" skills/word-master/scripts/template_manager.py install <docx> <name>
+"$PY" skills/word-master/scripts/template_derive.py <base> <new> [--desc ...] [--set-role ...]
 "$PY" skills/word-master/scripts/project_manager.py init <name> [--template qiji_heading]
 "$PY" skills/word-master/scripts/project_manager.py import-sources <proj> <sources...>
 "$PY" skills/word-master/scripts/project_manager.py validate <proj>

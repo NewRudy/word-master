@@ -55,6 +55,14 @@ discipline and route selection; each route authority owns its procedure.
 | **Fact ID** | `F001`-style provenance IDs in `facts.json`, cited by content and reconciled at delivery |
 | **Manual numbering zone** | Below heading level 7: sequence numbers （1）→ 1) → ① → a) are hand-typed text per unit convention — never auto-numbering |
 
+## Template Library
+
+Available packages live under [`templates/docs/`](templates/docs/); see
+[`templates/README.md`](templates/README.md) for the catalogue, the derivation
+tool, and how to add one. **Never generate without an installed package** — if
+the requested template is missing, stop and route to Create Template (or derive
+from an existing package when only role styles differ).
+
 ## Hard Rules (unit conventions, violating = rejected)
 
 1. Heading and caption numbers are produced **only** by auto-numbering fields. Hand-typed `1.1` prefixes on headings, `图x.x-x` prefixes on captions → blocking.

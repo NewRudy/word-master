@@ -8,6 +8,30 @@
       "date": "2026-10-19",
       "description": "七级标题大纲模板：工程报告样式规范 scaffold（宋体/黑体+Times New Roman，正文小四 1.5 倍，图表编号自动 章.节-序 式，7 级以下手打序号）。表格用 Table Grid 普通全框线。",
       "source": "单位在用模板入库（template_src.docx 字节保留）"
+    },
+    {
+      "name": "gov_report",
+      "dir": "gov_report",
+      "version": 1,
+      "date": "2026-10-19",
+      "description": "政府机关公文/技术报告：五级标题、仿宋小四正文、图表自动编号",
+      "source": "派生自 qiji_heading（template_derive.py）"
+    },
+    {
+      "name": "meeting_minutes",
+      "dir": "meeting_minutes",
+      "version": 1,
+      "date": "2026-10-19",
+      "description": "会议纪要/工作简报：三级标题、宋体小四正文、两级目录",
+      "source": "派生自 qiji_heading（template_derive.py）"
+    },
+    {
+      "name": "acceptance_report",
+      "dir": "acceptance_report",
+      "version": 1,
+      "date": "2026-10-19",
+      "description": "验收/评审报告：五级标题、宋体小四正文、图表按章.节-序编号",
+      "source": "派生自 qiji_heading（template_derive.py）"
     }
   ]
 }

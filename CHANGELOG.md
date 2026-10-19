@@ -18,6 +18,24 @@ Documentation and distribution release. No breaking change to the content
 grammar or the contract schema.
 
 ### Added
+- **Three derived template packages**: `gov_report` (government / public-sector
+  reports, 仿宋 body, 5 heading levels), `acceptance_report` (acceptance and
+  review reports, 5 heading levels), `meeting_minutes` (meeting minutes and
+  briefings, 3 heading levels, 2-level TOC)
+- `template_derive.py` — derive a template package from an existing validated
+  one. It patches `styles.xml` in place and then validates the result: every
+  XML part must parse, `python-docx` must open the file, every contract role
+  must point at a real style, and overridden fonts are synced into the
+  contract's font whitelist. It fails loudly rather than writing a broken
+  package.
+- `skills/word-master/templates/README.md` — the template library catalogue,
+  the derivation reference, and the three ways to obtain a package
+- `tests/test_template_derive.py` — every shipped package must be loadable and
+  internally consistent; derived packages must record their base; derivation
+  never changes the numbering contract
+- `--max-heading-level` and `--toc-depth` template-level rules, enforced by the
+  builder (a heading deeper than the template allows is an error, never a
+  silent downgrade)
 - `README_CN.md` — full Chinese README, the primary entry point for this audience
 - `docs/assets/before-after.png` + `scripts/make_compare_image.py` — the
   format-drift comparison figure used at the top of both READMEs

@@ -1,0 +1,154 @@
+{
+  "$schema": "word-master.template-contract.v1",
+  "template": "acceptance_report",
+  "version": 1,
+  "date": "2026-10-19",
+  "source_docx": "template_src.docx",
+  "built_docx": "template.docx",
+  "doc": "template_contract.md",
+  "styles": {
+    "doc_title": "17",
+    "h1": "2",
+    "h2": "3",
+    "h3": "5",
+    "h4": "6",
+    "h5": "7",
+    "h6": "8",
+    "h7": "9",
+    "body": "4",
+    "bullet": "1",
+    "figure": "36",
+    "fig_caption": "23",
+    "table_caption": "33",
+    "table_cell": "31",
+    "table": "19",
+    "toc_l1": "15",
+    "toc_l2": "16",
+    "toc_l3": "12",
+    "toc_heading": "17",
+    "header": "14",
+    "footer": "13"
+  },
+  "style_names": {
+    "17": "Title",
+    "2": "heading 1",
+    "3": "heading 2",
+    "5": "heading 3",
+    "6": "heading 4",
+    "7": "heading 5",
+    "8": "heading 6",
+    "9": "heading 7",
+    "4": "9 正文格式",
+    "1": "Normal",
+    "36": "10 图片格式",
+    "23": "6 图名格式",
+    "33": "7 表头格式",
+    "31": "8 表格文字",
+    "19": "Table Grid（普通全框线表，2026-10-19 用户指定，替代原 51 三线表蓝色样式）",
+    "51": "水环境三线表样式（蓝色，已弃用保留）"
+  },
+  "whitelist_paragraph_styles": [
+    "1",
+    "2",
+    "3",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "4",
+    "36",
+    "23",
+    "33",
+    "31",
+    "15",
+    "16",
+    "12",
+    "17",
+    "13",
+    "14"
+  ],
+  "blocked_paragraph_styles": [
+    "30",
+    "40",
+    "41",
+    "44",
+    "46",
+    "49"
+  ],
+  "allowed_run_formatting": [
+    "b",
+    "i",
+    "vertAlign"
+  ],
+  "fonts": {
+    "cjk_allowed": [
+      "宋体",
+      "黑体"
+    ],
+    "latin_allowed": [
+      "Times New Roman"
+    ],
+    "exempt": {
+      "style": {
+        "10": [
+          "Arial"
+        ],
+        "11": [
+          "Arial"
+        ]
+      }
+    }
+  },
+  "numbering": {
+    "heading_auto_numId": 1,
+    "heading_levels": {
+      "h1": 0,
+      "h2": 1,
+      "h3": 2,
+      "h4": 3,
+      "h5": 4,
+      "h6": 5,
+      "h7": 6
+    },
+    "caption": {
+      "fig": {
+        "numId": 1,
+        "ilvl": 7
+      },
+      "tbl": {
+        "numId": 1,
+        "ilvl": 8
+      }
+    },
+    "bullet_numId": 7,
+    "manual_below_h7": true,
+    "blocked_numIds": [
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "rules": {
+    "fig_caption_after_figure": true,
+    "tbl_caption_before_table": true,
+    "outline_lvl_fix_h1": true,
+    "toc_depth": 3,
+    "figure_inline_only": true,
+    "caption_number_autogen": true,
+    "hand_typed_caption_prefix_blocked": true,
+    "max_heading_level": 5
+  },
+  "description": "验收/评审报告：五级标题、宋体小四正文、图表按章.节-序编号",
+  "derived_from": {
+    "template": "qiji_heading",
+    "overrides": {
+      "body": {
+        "font_cjk": "宋体",
+        "font_latin": "Times New Roman",
+        "size_pt": 12.0
+      }
+    }
+  }
+}

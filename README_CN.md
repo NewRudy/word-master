@@ -152,7 +152,30 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 
 日常使用不需要手敲这些命令——agent 会跑。
 
-### 6. 导入单位自己的模板（可选，但这才是重点）
+### 6. 选模板（或者带自己的）
+
+仓库自带四个模板包——一份参考实现，三个派生变体：
+
+| 包名 | 适用场景 | 正文字体 | 最深标题 |
+|---|---|---|---|
+| `qiji_heading` | 工程技术报告（参考实现，单位真实模板） | 宋体 小四 | 7 级 |
+| `gov_report` | 政府机关公文 / 技术报告 | 仿宋 小四 | 5 级 |
+| `acceptance_report` | 验收 / 评审报告 | 宋体 小四 | 5 级 |
+| `meeting_minutes` | 会议纪要 / 工作简报 | 宋体 小四 | 3 级 |
+
+```bash
+"$PY" skills/word-master/scripts/project_manager.py init 我的报告 --template gov_report
+```
+
+只差角色样式或标题深度？几秒钟派生一个新包：
+
+```bash
+"$PY" skills/word-master/scripts/template_derive.py qiji_heading my_template     --desc "我的单位报告模板：四级标题、楷体正文"     --max-heading-level 4     --set-role "body:font=楷体,Times New Roman;size=14"
+```
+
+派生工具会校验产出的 OOXML（每个 part 可解析、`python-docx` 能打开、每个契约角色指向真实样式），校验不过就报错，绝不写一个坏包。完整说明见 [`templates/README.md`](skills/word-master/templates/README.md)。
+
+### 7. 导入单位自己的模板（可选，但这才是重点）
 
 如果单位有强制模板，一次性入库：
 
@@ -175,7 +198,8 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 | 📦 | [模板入库](./skills/word-master/workflows/create-template.md) | 单位 `.docx` → 模板包 |
 | ✏️ | [改已有文档](./skills/word-master/workflows/edit-native-docx.md) | 定点修改，其余字节保留 |
 | 📐 | [内容语法](./skills/word-master/references/content-grammar.md) | `content.md` 的全部语法 |
-| 🏗️ | [脚本工具链](./skills/word-master/scripts/) | project / template / builder / checker |
+| 📚 | [模板库](./skills/word-master/templates/README.md) | 现有模板包、派生方法、如何新增 |
+| 🏗️ | [脚本工具链](./skills/word-master/scripts/) | project / template / builder / checker / derive |
 | 💼 | [演示项目](./projects/_demo/) | 端到端示例，门禁通过 |
 | ❓ | [FAQ](./docs/faq.md) | 模型选择、成本、排错 |
 | 🆚 | [为什么选它](./docs/why-word-master.md) | 适用边界，什么时候不该用 |
@@ -184,9 +208,9 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 
 ## 项目状态
 
-**v0.2.0**：三路线骨架 + `qiji_heading` 模板（七级标题工程报告）+ 构建器 + fail-closed 门禁，端到端演示已通过。
+**v0.2.0**：三路线骨架 + 四个模板包（一份参考实现 + 三个派生变体）+ 构建器 + fail-closed 门禁，端到端演示已通过。
 
-路线图：确认页 UI（阶段式交互）→ PDF 来源转文本 → WPS COM 自动刷新域 → 多模板库扩充 → 图表数据驱动。
+路线图：确认页 UI（阶段式交互）→ PDF 来源转文本 → WPS COM 自动刷新域 → 模板库扩充（标书、年报、测试报告）→ 图表数据驱动。
 
 ## 贡献
 

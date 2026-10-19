@@ -173,7 +173,30 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 
 Daily use does not require typing any of these — the agent runs them.
 
-### 6. Bring In Your Own Template (optional but this is the point)
+### 6. Pick a Template (or bring your own)
+
+Four packages ship with the repo — the reference engineering-report template plus three derived variants:
+
+| Package | For | Body font | Deepest heading |
+|---|---|---|---|
+| `qiji_heading` | engineering technical reports (reference, a real unit template) | 宋体 小四 | 7 |
+| `gov_report` | government / public-sector reports | 仿宋 小四 | 5 |
+| `acceptance_report` | acceptance and review reports | 宋体 小四 | 5 |
+| `meeting_minutes` | meeting minutes, briefings | 宋体 小四 | 3 |
+
+```bash
+"$PY" skills/word-master/scripts/project_manager.py init 我的报告 --template gov_report
+```
+
+Need a variant that differs only in role styles or heading depth? Derive one in seconds:
+
+```bash
+"$PY" skills/word-master/scripts/template_derive.py qiji_heading my_template     --desc "我的单位报告模板：四级标题、楷体正文"     --max-heading-level 4     --set-role "body:font=楷体,Times New Roman;size=14"
+```
+
+The derivation tool validates the resulting OOXML (every part parses, `python-docx` opens it, every contract role points at a real style) and fails loudly instead of writing a broken package. Full reference: [`templates/README.md`](skills/word-master/templates/README.md).
+
+### 7. Bring In Your Own Template (optional but this is the point)
 
 If your unit has a mandated `.docx` template, ingest it once:
 
@@ -196,7 +219,8 @@ Then ask the agent to finish the *Create Template* route: it reviews the derived
 | 📦 | [Create Template](./skills/word-master/workflows/create-template.md) | Unit `.docx` → template package |
 | ✏️ | [Edit Native DOCX](./skills/word-master/workflows/edit-native-docx.md) | Targeted edits, everything else byte-preserved |
 | 📐 | [Content Grammar](./skills/word-master/references/content-grammar.md) | The complete `content.md` syntax |
-| 🏗️ | [Scripts](./skills/word-master/scripts/) | project / template / builder / checker |
+| 📚 | [Template Library](./skills/word-master/templates/README.md) | Shipped packages, derivation, how to add one |
+| 🏗️ | [Scripts](./skills/word-master/scripts/) | project / template / builder / checker / derive |
 | 💼 | [Demo Project](./projects/_demo/) | End-to-end example, gate passes |
 | ❓ | [FAQ](./docs/faq.md) | Model choice, cost, troubleshooting |
 | 🆚 | [Why word-master](./docs/why-word-master.md) | Where it fits, where it does not |
@@ -205,9 +229,9 @@ Then ask the agent to finish the *Create Template* route: it reviews the derived
 
 ## Project Status
 
-**v0.2.0** — three routes + one template package (`qiji_heading`, seven-level engineering report) + builder + fail-closed gate, end-to-end demo passing.
+**v0.2.0** — three routes + four template packages (one reference, three derived) + builder + fail-closed gate, end-to-end demo passing.
 
-Roadmap: confirmation UI (staged interaction) → PDF-to-text sources → WPS COM field refresh → more template packages → data-driven charts.
+Roadmap: confirmation UI (staged interaction) → PDF-to-text sources → WPS COM field refresh → more template packages (bid, annual report, test report) → data-driven charts.
 
 ## Contributing
 
