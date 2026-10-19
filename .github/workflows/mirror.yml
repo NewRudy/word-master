@@ -1,0 +1,39 @@
+name: Mirror
+
+# Mirrors the repository to AtomGit and Gitee so the project is reachable from
+# mainland China, where github.com is often slow or blocked.
+#
+# Setup (one time):
+#   1. Create the mirror repos (see scripts/mirror.py) or create them by hand.
+#   2. Add repository secrets: ATOMGIT_TOKEN, GITEE_TOKEN
+#   3. Optionally adjust the owners below.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to AtomGit
+        if: env.ATOMGIT_TOKEN != ''
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          git remote add atomgit "https://oauth2:${ATOMGIT_TOKEN}@atomgit.com/${GITHUB_REPOSITORY_OWNER}/word-master.git"
+          git push --prune atomgit "refs/remotes/origin/*:refs/heads/*" --tags
+
+      - name: Push to Gitee
+        if: env.GITEE_TOKEN != ''
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git remote add gitee "https://oauth2:${GITEE_TOKEN}@gitee.com/${GITHUB_REPOSITORY_OWNER}/word-master.git"
+          git push --prune gitee "refs/remotes/origin/*:refs/heads/*" --tags

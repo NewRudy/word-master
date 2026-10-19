@@ -31,6 +31,7 @@
 | [行为准则](../CODE_OF_CONDUCT_CN.md) | 社区规范 |
 | [安全策略](../SECURITY_CN.md) | 漏洞报告与不可信文档处理 |
 | [CHANGELOG](../CHANGELOG.md) | 版本记录 |
+| 🪞 | [镜像仓库](./mirrors.md) | AtomGit / Gitee 镜像的设置与同步 |
 
 ## 示例
 

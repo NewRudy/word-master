@@ -1,0 +1,202 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Create the word-master mirror repositories and push to them.
+
+Usage:
+    GITEE_TOKEN=xxxx python scripts/mirror.py --gitee
+    GITEE_TOKEN=xxxx ATOMGIT_TOKEN=yyyy python scripts/mirror.py --all
+
+Why this script exists rather than a few shell commands: creating a repo on
+Gitee/AtomGit needs an access token, and the repo description, topics and
+default branch have to be set at creation time or they end up inconsistent
+between the GitHub original and the mirror. This does all of it and is safe to
+re-run.
+
+Token setup:
+  Gitee   https://gitee.com/profile/personal_access_tokens
+          scopes: projects (read/write)
+  AtomGit https://atomgit.com/-/profile/personal_access_tokens
+          scopes: repo (read/write)
+
+The script never stores the token. Export it for the duration of the command.
+"""
+import argparse
+import json
+import os
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+
+NAME = "word-master"
+OWNER_HINT = os.environ.get("MIRROR_OWNER", "NewRudy")
+
+DESCRIPTION = (
+    "模板驱动的 Word 工程文档生产线：AI 只写内容，格式由单位模板契约锁定，"
+    "确定性脚本注入，fail-closed 门禁把关。"
+)
+
+TOPICS = [
+    "docx", "word", "ai", "ai-agents", "skill", "template",
+    "engineering-report", "ooxml", "python-docx", "claude-code",
+    "document-automation", "office-automation",
+]
+
+
+def run(args, cwd=None, check=True):
+    return subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=check)
+
+
+def api(url, token, method="GET", payload=None):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "word-master-mirror",
+    }
+    data = json.dumps(payload).encode() if payload is not None else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            body = r.read()
+            return r.status, json.loads(body) if body else {}
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", "replace")
+        try:
+            return e.code, json.loads(body)
+        except json.JSONDecodeError:
+            return e.code, {"raw": body}
+
+
+def ensure_remote(remote_url, token, cwd):
+    """Push main and tags to a mirror, replacing the token in the URL with the env."""
+    authed = remote_url.replace("https://", f"https://oauth2:{token}@", 1)
+    run(["git", "push", "--prune", authed, "main"], cwd=cwd)
+    run(["git", "push", "--tags", authed], cwd=cwd, check=False)
+
+
+def mirror_gitee(token, cwd):
+    base = "https://gitee.com/api/v5"
+    status, me = api(f"{base}/user?access_token={token}", token)
+    if status != 200:
+        print(f"  Gitee 认证失败 ({status}): {me}")
+        return False
+    owner = me.get("login")
+    print(f"  Gitee 账号: {owner}")
+
+    status, repo = api(f"{base}/repos/{owner}/{NAME}?access_token={token}", token)
+    if status == 200:
+        print(f"  Gitee 仓库已存在: {repo.get('html_url')}")
+    else:
+        status, repo = api(f"{base}/user/repos?access_token={token}", token, "POST", {
+            "name": NAME,
+            "description": DESCRIPTION,
+            "private": False,
+            "has_issues": True,
+            "has_wiki": False,
+            "default_branch": "main",
+        })
+        if status not in (200, 201):
+            print(f"  Gitee 建仓失败 ({status}): {repo}")
+            return False
+        print(f"  Gitee 仓库已创建: {repo.get('html_url')}")
+
+    # topics 在 Gitee 上叫 topics，需要单独接口
+    status, _ = api(f"{base}/repos/{owner}/{NAME}/topics?access_token={token}",
+                    token, "PUT", {"topics": TOPICS})
+    print(f"  Gitee topics: {'ok' if status in (200, 204) else f'failed ({status})'}")
+
+    ensure_remote(f"https://gitee.com/{owner}/{NAME}.git", token, cwd)
+    print(f"  Gitee 推送完成: https://gitee.com/{owner}/{NAME}")
+    return True
+
+
+def mirror_atomgit(token, cwd):
+    # AtomGit 的公开 API 前缀不稳定，按 OpenAPI v5 兼容形态尝试，
+    # 失败时明确告诉用户去网页建仓（网页建仓后 git push 一样可用）。
+    candidates = [
+        ("https://api.atomgit.com/api/v5", "api.atomgit.com/api/v5"),
+        ("https://atomgit.com/api/v5", "atomgit.com/api/v5"),
+    ]
+    for base, label in candidates:
+        status, me = api(f"{base}/user", token)
+        if status != 200:
+            continue
+        owner = me.get("login") or me.get("username") or OWNER_HINT
+        print(f"  AtomGit 账号: {owner} ({label})")
+
+        status, repo = api(f"{base}/repos/{owner}/{NAME}", token)
+        if status == 200:
+            print(f"  AtomGit 仓库已存在: {repo.get('html_url')}")
+        else:
+            status, repo = api(f"{base}/user/repos", token, "POST", {
+                "name": NAME,
+                "description": DESCRIPTION,
+                "private": False,
+                "default_branch": "main",
+            })
+            if status not in (200, 201):
+                print(f"  AtomGit 建仓失败 ({status}): {repo}")
+                print("  → 请在 https://atomgit.com/projects/new 手动建仓后重跑本脚本")
+                return False
+            print(f"  AtomGit 仓库已创建: {repo.get('html_url')}")
+
+        status, _ = api(f"{base}/repos/{owner}/{NAME}/topics", token, "PUT", {"topics": TOPICS})
+        print(f"  AtomGit topics: {'ok' if status in (200, 204) else f'failed ({status})'}")
+
+        ensure_remote(f"https://atomgit.com/{owner}/{NAME}.git", token, cwd)
+        print(f"  AtomGit 推送完成: https://atomgit.com/{owner}/{NAME}")
+        return True
+
+    print("  AtomGit API 不可用，请在 https://atomgit.com/projects/new 手动建仓后重跑")
+    return False
+
+
+def main():
+    ap = argparse.ArgumentParser(description="创建并推送 word-master 镜像仓库")
+    ap.add_argument("--gitee", action="store_true", help="镜像到 Gitee")
+    ap.add_argument("--atomgit", action="store_true", help="镜像到 AtomGit")
+    ap.add_argument("--all", action="store_true", help="两个都做")
+    ap.add_argument("--repo", default=".", help="本地仓库路径")
+    args = ap.parse_args()
+
+    do_gitee = args.gitee or args.all
+    do_atomgit = args.atomgit or args.all
+    if not (do_gitee or do_atomgit):
+        ap.error("至少指定 --gitee / --atomgit / --all")
+
+    cwd = os.path.abspath(args.repo)
+    status = run(["git", "rev-parse", "--is-inside-work-tree"], cwd=cwd, check=False)
+    if status.returncode != 0:
+        print(f"不是 git 仓库: {cwd}")
+        return 1
+
+    ok = True
+    if do_gitee:
+        token = os.environ.get("GITEE_TOKEN")
+        if not token:
+            print("缺少 GITEE_TOKEN（https://gitee.com/profile/personal_access_tokens）")
+            ok = False
+        else:
+            print("== Gitee ==")
+            ok &= mirror_gitee(token, cwd)
+
+    if do_atomgit:
+        token = os.environ.get("ATOMGIT_TOKEN")
+        if not token:
+            print("缺少 ATOMGIT_TOKEN（https://atomgit.com/-/profile/personal_access_tokens）")
+            ok = False
+        else:
+            print("== AtomGit ==")
+            ok &= mirror_atomgit(token, cwd)
+
+    print()
+    if ok:
+        print("完成。把镜像链接补回 README.md / README_CN.md 的 Quick Start。")
+        return 0
+    print("部分失败，见上。")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

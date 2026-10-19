@@ -31,6 +31,7 @@ User-facing documentation lives in `docs/`. Workflow and technical references co
 | [Code of Conduct](../CODE_OF_CONDUCT.md) | Community standards |
 | [Security Policy](../SECURITY.md) | Vulnerability reporting, untrusted document handling |
 | [CHANGELOG](../CHANGELOG.md) | Release history |
+| 🪞 | [Mirrors](./mirrors.md) | AtomGit / Gitee mirror setup and sync |
 
 ## Examples
 
