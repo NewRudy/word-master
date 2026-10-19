@@ -1,0 +1,62 @@
+name: Feature Request
+description: Suggest a capability for word-master
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening, note the project's hard constraint: **the template contract is the only style authority, and the gate is fail-closed.** Requests that let the AI choose formatting, or that weaken a blocking rule, will be declined.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Content grammar (new markup / role)
+        - Builder (rendering, fields, images, tables)
+        - Quality gate (new rule)
+        - Template package (new unit template)
+        - Template intake (analyze / create-template)
+        - Edit native DOCX
+        - Fact provenance
+        - CLI / tooling
+        - Documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What format guarantee do you need?
+      description: Describe the outcome, not the implementation. What goes wrong today?
+      placeholder: |
+        Example: my unit's template puts the table caption in a separate
+        paragraph style that my contract cannot express, so every build
+        fails C6.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach (optional)
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Alternatives you have considered
+      description: Including "just use Word" and "use docxtpl" — why do they not work here?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints acknowledgement
+      options:
+        - label: This does not let the AI assign fonts, sizes, spacing, or numbering
+          required: true
+        - label: This does not require weakening an existing blocking rule
+          required: true

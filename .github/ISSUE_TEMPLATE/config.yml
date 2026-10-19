@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: FAQ
+    url: https://github.com/NewRudy/word-master/blob/main/docs/faq.md
+    about: Check known answers before opening an issue
+  - name: Why word-master / when not to use it
+    url: https://github.com/NewRudy/word-master/blob/main/docs/why-word-master.md
+    about: Fit and non-fit scenarios, and a comparison with other approaches
+  - name: Discussions
+    url: https://github.com/NewRudy/word-master/discussions
+    about: Ask questions or share the template packages you built

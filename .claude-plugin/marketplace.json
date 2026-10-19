@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "word-master",
+  "owner": {
+    "name": "NewRudy",
+    "email": "1344591831@qq.com",
+    "url": "https://github.com/NewRudy"
+  },
+  "metadata": {
+    "description": "word-master skill — template-driven, contract-locked Word document production line",
+    "version": "0.2.0"
+  },
+  "plugins": [
+    {
+      "name": "word-master",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/NewRudy/word-master.git",
+        "path": "skills"
+      },
+      "description": "Generate a natively editable DOCX whose every format decision comes from a unit template contract: headings, captions, tables and numbering are applied by deterministic builder scripts and verified by a fail-closed quality gate. Note: run `pip install -r requirements.txt` inside the installed plugin directory for the Python scripts to work.",
+      "author": {
+        "name": "NewRudy",
+        "email": "1344591831@qq.com",
+        "url": "https://github.com/NewRudy"
+      },
+      "homepage": "https://github.com/NewRudy/word-master",
+      "repository": "https://github.com/NewRudy/word-master",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "docx",
+        "word",
+        "document",
+        "report",
+        "template",
+        "ooxml",
+        "ai",
+        "skill",
+        "office",
+        "engineering-report"
+      ]
+    }
+  ]
+}

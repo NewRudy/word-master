@@ -1,4 +1,4 @@
-@title: 河道水环境综合治理工程可行性研究（冒烟测试）
+@title: 河道水环境综合治理工程可行性研究
 
 # 概述
 
@@ -35,7 +35,7 @@
 工程地理位置见{{ref:fig:location}}，总体布置原则如下。
 
 :::figure location
-<img: D:\Work_other\07 word-master\_analysis\qiji_unpacked\word\media\image1.png>
+<img: assets/location.png>
 :::
 
 :::caption fig location 某河道工程地理位置图

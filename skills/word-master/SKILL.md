@@ -11,7 +11,7 @@ description: >
   template, or edit a Word document, DOCX, report, or 报告/文档, or mentions
   word-master.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   license: "MIT"
 ---
 

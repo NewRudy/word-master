@@ -1,0 +1,95 @@
+name: Bug Report
+description: Report a problem with word-master
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please check the [FAQ](https://github.com/NewRudy/word-master/blob/main/docs/faq.md) first — your issue may already have a known answer.
+
+        ⚠️ Do **not** attach a real document containing personal data. Redact names, ID numbers, phone numbers, and contract amounts.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Problem area
+      options:
+        - Generate DOCX (content grammar / build)
+        - Quality gate (doc_checker false positive or missed violation)
+        - Template package (create-template / analyze / contract)
+        - Edit native DOCX
+        - Fact provenance (facts.json / citations)
+        - Installation / dependencies
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      placeholder: Describe the problem clearly. Include the full error output if any.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. project_manager.py init demo
+        2. ...
+        3. doc_checker.py check projects/demo --json
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: word-master version
+      description: Output of `git rev-parse --short HEAD`, or the release tag.
+      placeholder: "e.g. v0.2.0 or 6e9854b"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-tool
+    attributes:
+      label: AI editor / tool
+      placeholder: "e.g. Claude Code, Cursor, Codex CLI, pi"
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: AI model
+      placeholder: "e.g. Claude Sonnet 4.5, GPT-5.4, Kimi K3"
+    validations:
+      required: false
+
+  - type: input
+    id: os-python
+    attributes:
+      label: OS and Python version
+      placeholder: "e.g. Windows 10 + Python 3.12.4"
+    validations:
+      required: true
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Relevant files
+      description: |
+        Paste `content.md`, the contract snippet, and `check_report.json` if relevant.
+        Attach a redacted `.docx` only if the issue cannot be shown otherwise.
+    validations:
+      required: false

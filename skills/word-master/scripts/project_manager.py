@@ -14,8 +14,18 @@ import shutil
 import sys
 from pathlib import Path
 
-from wm_common import (PROJECTS, TEMPLATES, WMError, slugify, empty_facts,
-                       load_contract, load_project, save_project, CONTENT_SKELETON)
+from wm_common import (
+    CONTENT_SKELETON,
+    PROJECTS,
+    TEMPLATES,
+    WMError,
+    empty_facts,
+    load_contract,
+    load_project,
+    resolve_project,
+    save_project,
+    slugify,
+)
 
 TODAY = dt.date.today().strftime("%Y%m%d")
 
@@ -45,11 +55,11 @@ def cmd_init(args):
     (p / "content.md").write_text(CONTENT_SKELETON.format(template=template), encoding="utf-8")
     print(f"项目已创建: {p.resolve()}")
     print(f"  模板: {template}  状态: initialized")
-    print(f"  下一步: import-sources → 确认大纲 → 编写 content.md")
+    print("  下一步: import-sources → 确认大纲 → 编写 content.md")
 
 
 def cmd_import(args):
-    meta, p = load_project(args.project_path)
+    meta, p = load_project(resolve_project(args.project_path))
     conv = p / "sources" / "converted"
     for s in args.sources:
         src = Path(s)
@@ -92,7 +102,7 @@ def convert_docx(src, out_txt):
 
 
 def cmd_validate(args):
-    meta, p = load_project(args.project_path)
+    meta, p = load_project(resolve_project(args.project_path))
     problems = []
     if meta.get("template") and not (TEMPLATES / meta["template"] / "contract.json").exists():
         problems.append(f"模板未入库: {meta['template']}")

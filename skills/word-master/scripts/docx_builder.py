@@ -17,10 +17,9 @@ from pathlib import Path
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Emu, Cm
+from docx.shared import Cm, Emu
 from docx.text.paragraph import Paragraph
-
-from wm_common import TEMPLATES, WMError, load_contract, load_project, save_project
+from wm_common import TEMPLATES, WMError, load_contract, load_project, resolve_project, save_project
 
 FACT_RE = re.compile(r"<!--\s*(F\d+)\s*-->")
 REF_RE = re.compile(r"\{\{ref:(fig|tbl):([\w\-]+)\}\}")
@@ -160,6 +159,9 @@ def parse_content(md_text):
             items.append(("figure", slug, img))
             i += 1
             continue
+        if re.match(r"^#{8,}\s+", s):
+            # content-grammar: ######## and deeper is a syntax error, not body text
+            raise WMError(f"标题级别超过 7 级（第{i + 1}行）: {s.split()[0]}")
         m = re.match(r"^(#{1,7})\s+(.*)$", s)
         if m:
             items.append(("heading", len(m.group(1)), m.group(2).strip()))
@@ -178,7 +180,8 @@ def parse_content(md_text):
 
 # ---------------------------------------------------------------- renderer
 class Renderer:
-    def __init__(self, doc, contract, bookmarks):
+    def __init__(self, doc, contract, bookmarks, project_dir=None):
+        self.project_dir = Path(project_dir) if project_dir else Path.cwd()
         self.doc = doc
         self.c = contract
         self.bm = bookmarks
@@ -224,6 +227,9 @@ class Renderer:
     def figure(self, slug, img_path):
         from docx.image.image import Image as DocxImage
         path = Path(img_path)
+        if not path.is_absolute():
+            # 相对路径按项目根目录解析（content.md 所在目录），仓库自带示例可直接复用
+            path = self.project_dir / path
         if not path.exists():
             raise WMError(f"figure {slug} 图片不存在: {path}")
         p = para_with_style(self.doc, self.styles["figure"])
@@ -316,7 +322,7 @@ class Renderer:
             print(f"WARNING: content 引用了 facts.json 中不存在的事实: {', '.join(missing)}")
         if not cited:
             return
-        para_with_style(self.doc, self.styles["toc_heading"]).add_run("来  源")
+        para_with_style(self.doc, self.styles.get("sources_heading", self.styles["toc_heading"])).add_run("来  源")
         by_id = {f.get("id"): f for f in facts.get("facts", [])}
         for fid in cited:
             f = by_id.get(fid)
@@ -338,7 +344,7 @@ def clear_body(doc):
 
 
 def cmd_build(args):
-    meta, ppath = load_project(args.project_path)
+    meta, ppath = load_project(resolve_project(args.project_path))
     template = meta["template"]
     contract = load_contract(template)
     pkg = TEMPLATES / template
@@ -353,7 +359,7 @@ def cmd_build(args):
     doc = Document(str(shell))
     clear_body(doc)
     bm = Bookmarks()
-    r = Renderer(doc, contract, bm)
+    r = Renderer(doc, contract, bm, project_dir=ppath)
     r.toc_page(int(contract["rules"].get("toc_depth", 3)))
 
     items = parse_content(content_md.read_text(encoding="utf-8"))
@@ -395,7 +401,7 @@ def cmd_build(args):
     save_project(meta, ppath)
     print(f"[BUILD] {out.resolve()}")
     print(f"  标题/段落/图/表: 渲染完成；引用事实 {len(set(r.facts_cited))} 条")
-    print(f"  下一步: doc_checker.py check {ppath}")
+    print(f"  下一步: doc_checker.py check {meta['slug']}")
 
 
 def main():

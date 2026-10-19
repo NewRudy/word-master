@@ -18,7 +18,7 @@ Three routes:
 
 - Python: `%LOCALAPPDATA%\Programs\Python\Python312\python.exe` (not on PATH); always run with `-X utf8`
 - Windows 10 + WPS; **no Microsoft Office**. TOC/page-number fields refresh with Ctrl+A → F9 in WPS (WPS COM automation is a future option)
-- No git repo yet; `projects/` is the user workspace
+- Tests: `python -m pytest -q`; lint: `python -m ruff check .`
 
 ## Required Conventions
 
@@ -26,25 +26,33 @@ Three routes:
 - **Source preservation**: `template_src.docx` (the ingested original) is never modified. Derivatives are new files.
 - **Numbering discipline**: heading and caption numbers come from auto-numbering fields only; below heading level 7, sequence numbers are hand-typed text per the unit convention (（1）→ 1) → ① → a)).
 - **One language per file** for docs; scripts emit UTF-8.
+- **Gate rules may only get stricter** unless the relaxation is backed by a contract change the template itself supports. Every new rule needs a failing fixture under `tests/`.
 
 ## Command Quick Reference
 
 ```bash
-PY="%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
-"$PY" -X utf8 skills/word-master/scripts/project_manager.py init <name> [--template qiji_heading]
-"$PY" -X utf8 skills/word-master/scripts/project_manager.py import-sources <project_path> <sources...>
-"$PY" -X utf8 skills/word-master/scripts/project_manager.py validate <project_path>
-"$PY" -X utf8 skills/word-master/scripts/template_manager.py list
-"$PY" -X utf8 skills/word-master/scripts/template_manager.py analyze <docx> [--out <dir>]
-"$PY" -X utf8 skills/word-master/scripts/docx_builder.py build <project_path>
-"$PY" -X utf8 skills/word-master/scripts/doc_checker.py check <project_path> [--json]
+PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -X utf8
+
+"$PY" skills/word-master/scripts/template_manager.py list
+"$PY" skills/word-master/scripts/template_manager.py analyze <docx> --out <dir>
+"$PY" skills/word-master/scripts/template_manager.py install <docx> <name>
+"$PY" skills/word-master/scripts/project_manager.py init <name> [--template qiji_heading]
+"$PY" skills/word-master/scripts/project_manager.py import-sources <proj> <sources...>
+"$PY" skills/word-master/scripts/project_manager.py validate <proj>
+"$PY" skills/word-master/scripts/project_manager.py list
+"$PY" skills/word-master/scripts/docx_builder.py build <proj>
+"$PY" skills/word-master/scripts/doc_checker.py check <proj> --json
 ```
 
-## Core Directories
+`<proj>` accepts an absolute path, a path relative to the current directory, or a bare project directory name under `projects/`.
 
-- `skills/word-master/SKILL.md` — discipline and route entry
-- `skills/word-master/workflows/` — route authorities
-- `skills/word-master/references/` — content grammar and craft modules
-- `skills/word-master/scripts/` — deterministic toolchain
-- `skills/word-master/templates/docs/` — template library (one package per unit template)
-- `projects/` — user project workspace
+## Repository Layout
+
+```
+skills/word-master/     the skill (authority files, scripts, template packages)
+projects/               user workspaces (gitignored) + _demo/ (committed)
+docs/                   user-facing documentation (FAQ, positioning, assets)
+scripts/                repo maintenance scripts (not part of the skill)
+tests/                  pytest suite; gate-rule fixtures
+.github/                CI and issue templates
+```

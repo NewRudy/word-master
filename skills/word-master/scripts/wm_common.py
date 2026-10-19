@@ -9,6 +9,22 @@ SKILL = Path(__file__).resolve().parents[1]
 TEMPLATES = SKILL / "templates" / "docs"
 PROJECTS = REPO / "projects"
 
+
+def resolve_project(project_path):
+    """Accept an absolute path, a path relative to cwd, or a bare project name.
+
+    A bare name is looked up under the repo's projects/ directory, so the
+    README can document `... check _demo` as well as `... check projects/_demo`.
+    """
+    p = Path(project_path)
+    if p.exists():
+        return p
+    if not p.is_absolute() and len(p.parts) == 1:
+        cand = PROJECTS / p
+        if cand.exists():
+            return cand
+    raise WMError(f"项目不存在: {project_path}（也不是 projects/ 下的目录名）")
+
 FACT_SCHEMA = "word-master.fact-provenance.v1"
 
 

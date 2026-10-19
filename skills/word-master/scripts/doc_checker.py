@@ -9,12 +9,10 @@ import argparse
 import json
 import re
 import sys
-from pathlib import Path
 
 from docx import Document
 from docx.oxml.ns import qn
-
-from wm_common import WMError, load_contract, load_project, FACT_SCHEMA
+from wm_common import REPO, WMError, load_contract, load_project, resolve_project
 
 HAND_HEADING_NUM = re.compile(r"^\s*\d+(\.\d+)+\s")          # "1.1 标题"（编号应为域）
 HAND_CAPTION_NUM = re.compile(r"^\s*[图表]\s*\d")             # "图1.1-1 xxx"（编号应为域）
@@ -196,7 +194,7 @@ def check(docx_path, contract, facts):
 
 
 def cmd_check(args):
-    meta, ppath = load_project(args.project_path)
+    meta, ppath = load_project(resolve_project(args.project_path))
     contract = load_contract(meta["template"])
     exports = sorted((ppath / "exports").glob("*.docx"))
     if not exports:
@@ -205,9 +203,14 @@ def cmd_check(args):
     facts = json.loads((ppath / "facts.json").read_text(encoding="utf-8"))
 
     f, stats = check(target, contract, facts)
+    try:
+        # 仓库内产物写相对路径，报告可安全提交/分享
+        target_ref = target.resolve().relative_to(REPO.resolve()).as_posix()
+    except ValueError:
+        target_ref = str(target.resolve())
     report = {
         "$schema": "word-master.check-report.v1",
-        "target": str(target.resolve()),
+        "target": target_ref,
         "template": meta["template"],
         "blocking": len(f.blocking()),
         "advisory": len(f.advisory()),

@@ -1,0 +1,27 @@
+[project]
+name = "word-master"
+version = "0.2.0"
+description = "Template-driven Word document production line for engineering reports"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["python-docx>=1.1.0"]
+
+[project.urls]
+Homepage = "https://github.com/NewRudy/word-master"
+Documentation = "https://github.com/NewRudy/word-master/blob/main/docs/faq.md"
+Issues = "https://github.com/NewRudy/word-master/issues"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+extend-exclude = ["projects", "skills/word-master/templates"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+# UP009: explicit utf-8 declarations are kept on purpose (Windows consoles).
+ignore = ["E501", "UP009"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

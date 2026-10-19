@@ -1,0 +1,29 @@
+{
+  "$schema": "word-master.project.v1",
+  "name": "演示：河道水环境综合治理工程可行性研究",
+  "slug": "河道水环境综合治理工程可行性研究",
+  "template": "qiji_heading",
+  "created": "2026-10-19T11:35:11",
+  "status": "built",
+  "sources": [],
+  "timeline": [
+    {
+      "ts": "2026-10-19T17:31:13",
+      "event": "build",
+      "output": "河道水环境综合治理工程可行性研究_20261019_173113.docx",
+      "facts_cited": [
+        "F001",
+        "F002"
+      ]
+    },
+    {
+      "ts": "2026-10-19T17:34:39",
+      "event": "build",
+      "output": "河道水环境综合治理工程可行性研究_20261019_173439.docx",
+      "facts_cited": [
+        "F001",
+        "F002"
+      ]
+    }
+  ]
+}

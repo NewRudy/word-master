@@ -244,10 +244,10 @@ def cmd_install(args):
     (pkg / "contract.json").write_text(json.dumps(contract, ensure_ascii=False, indent=2),
                                        encoding="utf-8")
     print(f"模板包骨架已建: {pkg}")
-    print(f"  - template_src.docx（原件字节副本）")
-    print(f"  - analysis.md（机器草稿，需人工补 quirk/gap）")
+    print("  - template_src.docx（原件字节副本）")
+    print("  - analysis.md（机器草稿，需人工补 quirk/gap）")
     print(f"  - contract.json（骨架，heading 已自动映射 {len(heading_roles)} 项，其余 _TODO 待补）")
-    print(f"  下一步: 走 create-template.md Step 3（契约评审 ⛔）→ Step 4 清理壳 → Step 5 文档化")
+    print("  下一步: 走 create-template.md Step 3（契约评审 ⛔）→ Step 4 清理壳 → Step 5 文档化")
 
 
 def cmd_list(_args):

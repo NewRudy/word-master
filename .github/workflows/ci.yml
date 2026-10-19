@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: build + gate + tests (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: python -m ruff check .
+
+      - name: Unit tests
+        run: python -m pytest -q
+
+      - name: Build the bundled demo
+        run: python skills/word-master/scripts/docx_builder.py build projects/_demo
+
+      - name: Run the quality gate on the demo
+        run: python skills/word-master/scripts/doc_checker.py check projects/_demo --json
+
+      - name: Upload the built demo document
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-docx-${{ matrix.os }}-py${{ matrix.python }}
+          path: projects/_demo/exports/*.docx
+          if-no-files-found: warn
+          retention-days: 14
