@@ -1,0 +1,25 @@
+# Normalize line endings so the repo behaves the same on Windows, macOS, Linux.
+* text=auto eol=lf
+
+# Binary artifacts must never be line-ending converted.
+*.docx  binary
+*.doc   binary
+*.pptx  binary
+*.xlsx  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.pdf   binary
+*.ttf   binary
+*.woff* binary
+
+# Generated comparison figure: keep as-is so the README renders identically.
+docs/assets/before-after.png binary
+
+# Shell scripts keep LF even on Windows checkouts.
+*.sh    text eol=lf
+*.mjs   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
