@@ -95,7 +95,6 @@ cd word-master
 pip install -r requirements.txt
 ```
 
-> 国内镜像：[AtomGit](https://atomgit.com/NewRudy/word-master) · [Gitee](https://gitee.com/NewRudy/word-master)
 
 #### 以后更新
 

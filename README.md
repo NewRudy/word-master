@@ -116,8 +116,6 @@ cd word-master
 pip install -r requirements.txt
 ```
 
-> Mirrors: [AtomGit](https://atomgit.com/NewRudy/word-master) · [Gitee](https://gitee.com/NewRudy/word-master)
-> (useful when GitHub is slow from mainland China)
 
 #### Updating later
 
