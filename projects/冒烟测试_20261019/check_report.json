@@ -1,0 +1,13 @@
+{
+  "$schema": "word-master.check-report.v1",
+  "target": "D:\\Work_other\\07 word-master\\word-master\\projects\\冒烟测试_20261019\\exports\\冒烟测试_20261019_20261019_140051.docx",
+  "template": "qiji_heading",
+  "blocking": 0,
+  "advisory": 0,
+  "stats": {
+    "figs": 1,
+    "tbls": 1,
+    "captioned_tbls": 1
+  },
+  "findings": []
+}

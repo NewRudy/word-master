@@ -1,0 +1,19 @@
+{
+  "$schema": "word-master.fact-provenance.v1",
+  "facts": [
+    {
+      "id": "F001",
+      "claim": "工程范围自花园至泵站河段，全长约 2.4 km",
+      "url": "https://example.com/proj-brief",
+      "date": "2026-09",
+      "source_tier": "项目资料"
+    },
+    {
+      "id": "F002",
+      "claim": "工程布置兼顾防洪与水环境功能，与上位规划相协调",
+      "url": "https://example.com/planning-doc",
+      "date": "2026-08",
+      "source_tier": "政府发文"
+    }
+  ]
+}
