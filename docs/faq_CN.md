@@ -94,7 +94,7 @@
 
 ### 能支持我们单位的模板吗？
 
-能——这就是 *Create Template* 路线。完整模板包需要什么，见 [CONTRIBUTING_CN.md](./CONTRIBUTING_CN.md#新增模板包)。
+能——这就是 *Create Template* 路线。完整模板包需要什么，见 [CONTRIBUTING_CN.md](../CONTRIBUTING_CN.md#新增模板包)。
 
 注意：严重依赖浮动图片、文本框或内容控件的模板可能无法完全复现，入库分析会告诉你。
 

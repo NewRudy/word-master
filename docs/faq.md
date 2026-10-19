@@ -94,7 +94,7 @@ But: once you hand-edit, do not rebuild from `content.md` on top of it. Pick one
 
 ### Can it handle my unit's template?
 
-Yes — that is the *Create Template* route. See [CONTRIBUTING.md](./CONTRIBUTING.md#adding-a-template-package) for what a complete package requires.
+Yes — that is the *Create Template* route. See [CONTRIBUTING.md](../CONTRIBUTING.md#adding-a-template-package) for what a complete package requires.
 
 Caveat: a template that relies on floating images, text boxes, or content controls may not be fully reproducible. The intake analysis will tell you.
 
