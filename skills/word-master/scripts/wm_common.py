@@ -23,6 +23,17 @@ def resolve_project(project_path):
         cand = PROJECTS / p
         if cand.exists():
             return cand
+        # `init <name>` creates `<slug>_<YYYYMMDD>`; accept the bare name and
+        # resolve to the most recent matching directory (the date suffix sorts
+        # lexicographically, so a reverse sort yields the newest project).
+        if PROJECTS.is_dir():
+            matches = sorted(
+                (d for d in PROJECTS.iterdir()
+                 if d.is_dir() and (d.name == p.name or d.name.startswith(p.name + "_"))),
+                reverse=True,
+            )
+            if matches:
+                return matches[0]
     raise WMError(f"项目不存在: {project_path}（也不是 projects/ 下的目录名）")
 
 FACT_SCHEMA = "word-master.fact-provenance.v1"

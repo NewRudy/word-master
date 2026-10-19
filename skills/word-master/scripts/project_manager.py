@@ -38,6 +38,7 @@ def cmd_init(args):
     template = args.template
     load_contract(template)  # fail fast if template not installed
     (p / "sources" / "converted").mkdir(parents=True)
+    (p / "assets").mkdir()
     (p / "exports").mkdir()
     meta = {
         "$schema": "word-master.project.v1",
@@ -55,7 +56,7 @@ def cmd_init(args):
     (p / "content.md").write_text(CONTENT_SKELETON.format(template=template), encoding="utf-8")
     print(f"项目已创建: {p.resolve()}")
     print(f"  模板: {template}  状态: initialized")
-    print("  下一步: import-sources → 确认大纲 → 编写 content.md")
+    print(f"  下一步: import-sources {slug} <材料...> → 确认大纲 → 编写 content.md")
 
 
 def cmd_import(args):

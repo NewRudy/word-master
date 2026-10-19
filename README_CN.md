@@ -146,6 +146,7 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 "$PY" skills/word-master/scripts/template_manager.py list                    # 看模板库
 "$PY" skills/word-master/scripts/project_manager.py init <项目名>             # 建项目
 "$PY" skills/word-master/scripts/project_manager.py import-sources <项目> <材料...>
+"$PY" skills/word-master/scripts/project_manager.py validate <项目>           # 校验项目完整性
 "$PY" skills/word-master/scripts/docx_builder.py build <项目>                 # 构建
 "$PY" skills/word-master/scripts/doc_checker.py check <项目> --json           # 门禁
 ```

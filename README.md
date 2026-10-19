@@ -168,6 +168,7 @@ PY="python"   # Windows: "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" -
 "$PY" skills/word-master/scripts/template_manager.py list                    # list template packages
 "$PY" skills/word-master/scripts/project_manager.py init <name>               # create a project
 "$PY" skills/word-master/scripts/project_manager.py import-sources <proj> <src...>
+"$PY" skills/word-master/scripts/project_manager.py validate <proj>           # check project integrity
 "$PY" skills/word-master/scripts/docx_builder.py build <proj>                 # build
 "$PY" skills/word-master/scripts/doc_checker.py check <proj> --json           # gate
 ```

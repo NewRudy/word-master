@@ -99,3 +99,17 @@ def test_unregistered_fact_in_facts_json_is_advisory_only(demo_project):
     p.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     _build(demo_project)
     assert _check(demo_project) == 0
+
+
+def test_bare_project_name_resolves_to_latest(tmp_path, monkeypatch):
+    """`build 我的报告` must find `projects/我的报告_20261019/`."""
+    import wm_common
+
+    projects = tmp_path / "projects"
+    old = projects / "我的报告_20260101"
+    new = projects / "我的报告_20261019"
+    old.mkdir(parents=True)
+    new.mkdir(parents=True)
+
+    monkeypatch.setattr(wm_common, "PROJECTS", projects)
+    assert wm_common.resolve_project("我的报告") == new
