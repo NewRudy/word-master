@@ -32,6 +32,7 @@
 | [安全策略](../SECURITY_CN.md) | 漏洞报告与不可信文档处理 |
 | [CHANGELOG](../CHANGELOG.md) | 版本记录 |
 | 🪞 | [镜像仓库](./mirrors.md) | AtomGit / Gitee 镜像的设置与同步 |
+| 📝 | [文章草稿：AI 写的 Word 为什么每次格式都不一样](./blog-format-drift_CN.md) | 对外发布用，可直接投知乎/公众号/V2EX |
 
 ## 示例
 

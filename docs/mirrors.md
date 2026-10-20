@@ -20,15 +20,35 @@ GitHub 在国内经常慢或不通。为了让项目可达，维护者需要把�
 
 ### 2. 建仓并首次推送
 
+**推荐：用令牌文件**（令牌不会进 shell 历史，也不会进进程列表）
+
 ```bash
 cd word-master
 
+# 写一个只有你能读的文件（Git Bash / Linux / macOS）
+printf 'GITEE_TOKEN=你的gitee令牌
+ATOMGIT_TOKEN=你的atomgit令牌
+' > ~/.word-master-tokens
+chmod 600 ~/.word-master-tokens
+
+python scripts/mirror.py --all --token-file ~/.word-master-tokens
+
+# 用完删掉
+rm ~/.word-master-tokens
+```
+
+**或者用环境变量**（注意：在某些 shell 里会进历史记录）
+
+```bash
 GITEE_TOKEN=xxxxx ATOMGIT_TOKEN=yyyyy python scripts/mirror.py --all
 
 # 只做其中一个：
 GITEE_TOKEN=xxxxx python scripts/mirror.py --gitee
 ATOMGIT_TOKEN=yyyyy python scripts/mirror.py --atomgit
 ```
+
+脚本不会把令牌写在命令行上（`git push` 走临时 credential helper + 环境变量），
+所以 `ps aux` 和错误输出里都看不到它。
 
 脚本会：读取账号 → 建仓（已存在则跳过）→ 设置描述和 topics → 推送 `main` 和 tags。
 可重复执行，幂等。

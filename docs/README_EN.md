@@ -32,6 +32,7 @@ User-facing documentation lives in `docs/`. Workflow and technical references co
 | [Security Policy](../SECURITY.md) | Vulnerability reporting, untrusted document handling |
 | [CHANGELOG](../CHANGELOG.md) | Release history |
 | 🪞 | [Mirrors](./mirrors.md) | AtomGit / Gitee mirror setup and sync |
+| 📝 | [Blog draft: why AI-written Word documents never match](./blog-format-drift_CN.md) | Chinese draft for external publication |
 
 ## Examples
 

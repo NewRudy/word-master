@@ -23,6 +23,7 @@ The script never stores the token. Export it for the duration of the command.
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -69,10 +70,27 @@ def api(url, token, method="GET", payload=None):
 
 
 def ensure_remote(remote_url, token, cwd):
-    """Push main and tags to a mirror, replacing the token in the URL with the env."""
-    authed = remote_url.replace("https://", f"https://oauth2:{token}@", 1)
-    run(["git", "push", "--prune", authed, "main"], cwd=cwd)
-    run(["git", "push", "--tags", authed], cwd=cwd, check=False)
+    """Push main and tags to a mirror without putting the token on the command line.
+
+    `git push https://user:token@host/...` leaks the token into the process list
+    (`ps aux`) and into any error message. Feed it through an environment
+    variable and a throwaway credential helper instead.
+    """
+    env = dict(os.environ)
+    env["MIRROR_GIT_TOKEN"] = token
+    helper = '!f() { echo "username=oauth2"; echo "password=$MIRROR_GIT_TOKEN"; }; f'
+    base = ["git", "-c", f"credential.helper={helper}"]
+
+    for refspec in ("main", None):
+        args = base + ["push", "--prune", remote_url]
+        args += [refspec] if refspec else ["--tags"]
+        proc = subprocess.run(args, cwd=cwd, capture_output=True, text=True, env=env)
+        if proc.returncode != 0:
+            # Scrub anything that looks like a credential before showing it.
+            err = re.sub(r"https://[^@/\s]+@", "https://***@", proc.stderr)
+            print(f"    push 失败: {err.strip()[:300]}")
+            if refspec == "main":
+                raise RuntimeError("主分支推送失败，镜像未建立")
 
 
 def mirror_gitee(token, cwd):
@@ -158,6 +176,8 @@ def main():
     ap.add_argument("--atomgit", action="store_true", help="镜像到 AtomGit")
     ap.add_argument("--all", action="store_true", help="两个都做")
     ap.add_argument("--repo", default=".", help="本地仓库路径")
+    ap.add_argument("--token-file", default=None,
+                    help="从文件读取 token（比环境变量更适合交互式终端）")
     args = ap.parse_args()
 
     do_gitee = args.gitee or args.all
@@ -171,6 +191,35 @@ def main():
         print(f"不是 git 仓库: {cwd}")
         return 1
 
+    if args.token_file:
+        try:
+            with open(args.token_file, encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, _, v = line.partition("=")
+                    os.environ.setdefault(k.strip(), v.strip())
+        except OSError as e:
+            print(f"无法读取 --token-file: {e}")
+            return 1
+
+    ok = True
+    try:
+        ok = _run_mirrors(args, do_gitee, do_atomgit, cwd)
+    except RuntimeError as e:
+        print(f"失败: {e}")
+        ok = False
+
+    print()
+    if ok:
+        print("完成。把镜像链接补回 README.md / README_CN.md 的 Quick Start。")
+        return 0
+    print("部分失败，见上。")
+    return 1
+
+
+def _run_mirrors(args, do_gitee, do_atomgit, cwd):
     ok = True
     if do_gitee:
         token = os.environ.get("GITEE_TOKEN")
@@ -190,12 +239,7 @@ def main():
             print("== AtomGit ==")
             ok &= mirror_atomgit(token, cwd)
 
-    print()
-    if ok:
-        print("完成。把镜像链接补回 README.md / README_CN.md 的 Quick Start。")
-        return 0
-    print("部分失败，见上。")
-    return 1
+    return ok
 
 
 if __name__ == "__main__":
