@@ -48,13 +48,19 @@ def run(args, cwd=None, check=True):
     return subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=check)
 
 
-def api(url, token, method="GET", payload=None):
+def api(url, token, method="GET", payload=None, auth_header="Authorization", auth_scheme="Bearer"):
+    """Call a REST endpoint.
+
+    Gitee uses `Authorization: Bearer <token>`; AtomGit (GitLab-compatible)
+    expects `private-token: <token>`. Passing the wrong one yields a 401 that
+    looks like a bad token, which is a confusing failure to debug.
+    """
     headers = {
-        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "Accept": "application/json",
         "User-Agent": "word-master-mirror",
     }
+    headers[auth_header] = f"{auth_scheme} {token}" if auth_scheme else token
     data = json.dumps(payload).encode() if payload is not None else None
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
     try:
@@ -130,44 +136,40 @@ def mirror_gitee(token, cwd):
 
 
 def mirror_atomgit(token, cwd):
-    # AtomGit 的公开 API 前缀不稳定，按 OpenAPI v5 兼容形态尝试，
-    # 失败时明确告诉用户去网页建仓（网页建仓后 git push 一样可用）。
-    candidates = [
-        ("https://api.atomgit.com/api/v5", "api.atomgit.com/api/v5"),
-        ("https://atomgit.com/api/v5", "atomgit.com/api/v5"),
-    ]
-    for base, label in candidates:
-        status, me = api(f"{base}/user", token)
-        if status != 200:
-            continue
-        owner = me.get("login") or me.get("username") or OWNER_HINT
-        print(f"  AtomGit 账号: {owner} ({label})")
+    """AtomGit exposes a GitLab-compatible v5 API at atomgit.com/api/v5."""
+    base = "https://atomgit.com/api/v5"
+    AUTH = {"auth_header": "private-token", "auth_scheme": ""}
 
-        status, repo = api(f"{base}/repos/{owner}/{NAME}", token)
-        if status == 200:
-            print(f"  AtomGit 仓库已存在: {repo.get('html_url')}")
-        else:
-            status, repo = api(f"{base}/user/repos", token, "POST", {
-                "name": NAME,
-                "description": DESCRIPTION,
-                "private": False,
-                "default_branch": "main",
-            })
-            if status not in (200, 201):
-                print(f"  AtomGit 建仓失败 ({status}): {repo}")
-                print("  → 请在 https://atomgit.com/projects/new 手动建仓后重跑本脚本")
-                return False
-            print(f"  AtomGit 仓库已创建: {repo.get('html_url')}")
+    status, me = api(f"{base}/user", token, **AUTH)
+    if status != 200:
+        print(f"  AtomGit 认证失败 ({status}): {str(me)[:160]}")
+        return False
+    owner = me.get("login") or me.get("username") or OWNER_HINT
+    print(f"  AtomGit 账号: {owner}")
 
-        status, _ = api(f"{base}/repos/{owner}/{NAME}/topics", token, "PUT", {"topics": TOPICS})
-        print(f"  AtomGit topics: {'ok' if status in (200, 204) else f'failed ({status})'}")
+    status, repo = api(f"{base}/repos/{owner}/{NAME}", token, **AUTH)
+    if status == 200:
+        print(f"  AtomGit 仓库已存在: {repo.get('html_url')}")
+    else:
+        status, repo = api(f"{base}/user/repos", token, "POST", {
+            "name": NAME,
+            "description": DESCRIPTION,
+            "private": False,
+            "default_branch": "main",
+        }, **AUTH)
+        if status not in (200, 201):
+            print(f"  AtomGit 建仓失败 ({status}): {str(repo)[:200]}")
+            print("  → 可手动建仓 https://atomgit.com/projects/new （不要初始化 README）后重跑")
+            return False
+        print(f"  AtomGit 仓库已创建: {repo.get('html_url')}")
 
-        ensure_remote(f"https://atomgit.com/{owner}/{NAME}.git", token, cwd)
-        print(f"  AtomGit 推送完成: https://atomgit.com/{owner}/{NAME}")
-        return True
+    status, _ = api(f"{base}/repos/{owner}/{NAME}/topics", token, "PUT",
+                    {"topics": TOPICS}, **AUTH)
+    print(f"  AtomGit topics: {'ok' if status in (200, 204) else f'skipped ({status})'}")
 
-    print("  AtomGit API 不可用，请在 https://atomgit.com/projects/new 手动建仓后重跑")
-    return False
+    ensure_remote(f"https://atomgit.com/{owner}/{NAME}.git", token, cwd)
+    print(f"  AtomGit 推送完成: https://atomgit.com/{owner}/{NAME}")
+    return True
 
 
 def main():
