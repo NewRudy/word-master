@@ -96,6 +96,11 @@ pip install -r requirements.txt
 ```
 
 
+#### 国内镜像
+
+同步镜像到 [Gitee](https://gitee.com/hhhsbgitee/word-master)，国内访问通常比 GitHub 快。
+镜像是单向推送的，可能滞后几分钟；Issue 和 PR 请提到 GitHub。
+
 #### 以后更新
 
 ```bash

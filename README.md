@@ -117,6 +117,12 @@ pip install -r requirements.txt
 ```
 
 
+#### Mirrors
+
+Mirrored to [Gitee](https://gitee.com/hhhsbgitee/word-master), which is usually
+faster than GitHub from mainland China. The mirror is push-only and may lag by a
+few minutes; issues and pull requests belong on GitHub.
+
 #### Updating later
 
 ```bash

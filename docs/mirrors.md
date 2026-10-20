@@ -11,6 +11,10 @@ GitHub 在国内经常慢或不通。为了让项目可达，维护者需要把�
 
 ## 一次性设置
 
+> **当前状态**：Gitee 镜像已建立（账号 `hhhsbgitee`，仓库
+> https://gitee.com/hhhsbgitee/word-master）。AtomGit 尚未建立。
+> 下面第 4 节的 README 片段已经应用。
+
 ### 1. 拿 token
 
 | 平台 | 地址 | 需要的作用域 |
