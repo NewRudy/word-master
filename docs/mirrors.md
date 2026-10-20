@@ -11,9 +11,11 @@ GitHub 在国内经常慢或不通。为了让项目可达，维护者需要把�
 
 ## 一次性设置
 
-> **当前状态**：Gitee 镜像已建立（账号 `hhhsbgitee`，仓库
-> https://gitee.com/hhhsbgitee/word-master）。AtomGit 尚未建立。
-> 下面第 4 节的 README 片段已经应用。
+> **当前状态**：两个镜像都已建立并验证与 GitHub 一致——
+> - Gitee：https://gitee.com/hhhsbgitee/word-master（账号 `hhhsbgitee`）
+> - AtomGit：https://atomgit.com/RudyYa/word-master（账号 `RudyYa`）
+>
+> AtomGit 的 topics 接口未开放（404），描述请在网页上手动填。
 
 ### 1. 拿 token
 

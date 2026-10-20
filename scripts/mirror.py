@@ -92,9 +92,13 @@ def ensure_remote(remote_url, token, cwd):
         args += [refspec] if refspec else ["--tags"]
         proc = subprocess.run(args, cwd=cwd, capture_output=True, text=True, env=env)
         if proc.returncode != 0:
-            # Scrub anything that looks like a credential before showing it.
-            err = re.sub(r"https://[^@/\s]+@", "https://***@", proc.stderr)
-            print(f"    push 失败: {err.strip()[:300]}")
+            # Scrub anything that looks like a credential, then show the real
+            # error. Hiding it entirely makes a transient failure
+            # indistinguishable from a broken token.
+            err = re.sub(r"(https://)[^@/\s]+@", r"\1***@", proc.stderr or proc.stdout)
+            print(f"    push {refspec or '--tags'} 失败 (exit {proc.returncode}):")
+            for line in err.strip().splitlines()[-6:]:
+                print(f"      {line}")
             if refspec == "main":
                 raise RuntimeError("主分支推送失败，镜像未建立")
 
