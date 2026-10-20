@@ -6,6 +6,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Gate rules **C9** and **C10**, which the contract documentation and the
+  announcement article already promised:
+  - **C9** (advisory) — body text citing a section number that no heading
+    produces ("见 9.9 节" with no such section). Heading numbers are computed
+    from document order because auto-numbering fields are unevaluated in the
+    built file.
+  - **C10** (advisory) — a body paragraph overriding the style's first-line
+    indent, which is the per-paragraph drift the contract exists to prevent.
+  - Both are advisory, not blocking: a stale cross-reference is a content
+    problem, and a local indent exception can be a legitimate unit convention.
+  - Fixtures: a bad cross-reference must be flagged, the demo's own
+    cross-references must not be.
+
 ### Planned
 - Staged confirmation UI (`confirm_ui`) replacing the chat-only `⛔ BLOCKING` gate
 - PDF → text source conversion (currently the original is copied only)

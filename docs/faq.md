@@ -139,3 +139,11 @@ word-master deliberately does **not**:
 - pick a model or a provider for you
 
 See [why-word-master.md](./why-word-master.md) for the reasoning.
+
+### The gate says `advisory [C9] cross-reference not in actual heading numbers`
+
+Body text says `见 9.9 节` but no heading resolves to 9.9. This is advisory (it does not block delivery) because the reference may be intentional or the heading may be added later. Fix the number, or drop the reference.
+
+### The gate says `advisory [C10] body first-line indent overridden`
+
+A body paragraph carries its own `w:ind` that differs from what the style defines. That is exactly the kind of drift the contract exists to prevent, so the checker flags it — but it does not block, because some documents legitimately need a local exception. Remove the override, or if it is a real unit convention, encode it in the template's contract instead.

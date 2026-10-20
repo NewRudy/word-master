@@ -53,7 +53,13 @@ def para_text(p):
     return "".join(t.text or "" for t in p.iter(qn("w:t")))
 
 
-def check(docx_path, contract, facts):
+
+def ind_attrs(ind):
+    """w:ind attributes as {localName: value} (attrib keys are qualified names)."""
+    return {k.replace(qn("w:"), ""): v for k, v in ind.attrib.items()}
+
+
+def check(docx_path, contract, facts, styles_doc=None):
     c = contract
     f = Findings()
     doc = Document(str(docx_path))
@@ -71,6 +77,9 @@ def check(docx_path, contract, facts):
             role_of.setdefault(sid, role)
 
     prev = {"empty": 0}
+    headings = []                # (level, text, where) for C9
+    body_texts = []              # (text, where) for C9
+    body_ind_overrides = []      # (w:ind, sid, text, where) for C10
     last_fig_p = None            # pending figure awaiting caption
     pending_tbl_cap = None       # pending table caption awaiting table
     captioned_tbls = 0
@@ -104,6 +113,16 @@ def check(docx_path, contract, facts):
                 f.add("blocking", "C4", f"标题疑似手打编号: {text[:24]!r}", where)
             if role in ("fig_caption", "table_caption") and HAND_CAPTION_NUM.match(text):
                 f.add("blocking", "C4", f"题注疑似手打编号: {text[:24]!r}", where)
+
+            # collect for C9 (cross-reference consistency)
+            if role.startswith("h"):
+                headings.append((int(role[1:]), text, where))
+            elif role == "body" and text.strip():
+                body_texts.append((text, where))
+
+            # collect for C10 (indent override detection)
+            if role == "body" and ppr is not None and ppr.find(qn("w:ind")) is not None:
+                body_ind_overrides.append((ppr.find(qn("w:ind")), sid, text, where))
 
             # C2/C3 run-level fonts & direct formatting
             for rpr in elx.iter(qn("w:rPr")):
@@ -180,6 +199,44 @@ def check(docx_path, contract, facts):
     if pending_tbl_cap is not None:
         f.add("blocking", "C6", f"表题（{pending_tbl_cap}）之后没有表格", pending_tbl_cap)
 
+    # C9: cross-reference consistency. Body text like "见 3.2 节" must point at
+    # a heading number that actually exists. Heading numbers are computed from
+    # the document order of heading paragraphs (they come from auto-numbering
+    # fields, so the built file cannot tell us what they resolved to).
+    if contract["numbering"].get("heading_auto_numId") is not None:
+        computed = set()
+        counters = {}
+        for lvl, _text, _w in headings:
+            counters[lvl] = counters.get(lvl, 0) + 1
+            for deeper in list(counters):
+                if deeper > lvl:
+                    del counters[deeper]
+            computed.add(".".join(str(counters[k]) for k in sorted(counters)))
+        for body_text, where in body_texts:
+            for m in re.finditer(r"见\s*(\d+(?:\.\d+){1,3})\s*(?:节|章|条)", body_text):
+                if m.group(1) not in computed:
+                    f.add("advisory", "C9",
+                          f"交叉引用 {m.group(1)!r} 不在实际标题编号中", where)
+
+    # C10: a body paragraph overriding the style's first-line indent. The style
+    # owns indentation; per-paragraph overrides reintroduce exactly the drift
+    # the contract exists to prevent.
+    style_ind = {}
+    if styles_doc is not None:
+        for st in styles_doc:
+            el = st.element
+            ppr = el.find(qn("w:pPr"))
+            if ppr is not None:
+                ind = ppr.find(qn("w:ind"))
+                if ind is not None:
+                    style_ind[st.style_id] = ind_attrs(ind)
+    for ind, sid, _text, where in body_ind_overrides:
+        want = style_ind.get(sid, {})
+        got = ind_attrs(ind)
+        if want and got != want:
+            f.add("advisory", "C10",
+                  f"正文首行缩进被段落级覆盖: {got}（样式 {sid} 定义 {want}）", where)
+
     # facts reconciliation: content.md citations vs facts.json
     cpath = docx_path.parent.parent / "content.md"
     if cpath.exists():
@@ -202,7 +259,7 @@ def cmd_check(args):
     target = exports[-1]
     facts = json.loads((ppath / "facts.json").read_text(encoding="utf-8"))
 
-    f, stats = check(target, contract, facts)
+    f, stats = check(target, contract, facts, styles_doc=Document(str(target)).styles)
     try:
         # 仓库内产物写相对路径，报告可安全提交/分享
         target_ref = target.resolve().relative_to(REPO.resolve()).as_posix()

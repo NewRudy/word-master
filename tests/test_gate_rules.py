@@ -4,6 +4,8 @@
 These tests are the contract's teeth. If a rule stops firing, the gate has been
 weakened and this file should fail loudly.
 """
+import json
+
 import doc_checker
 import docx_builder
 
@@ -113,3 +115,41 @@ def test_bare_project_name_resolves_to_latest(tmp_path, monkeypatch):
 
     monkeypatch.setattr(wm_common, "PROJECTS", projects)
     assert wm_common.resolve_project("我的报告") == new
+
+
+def test_bad_cross_reference_is_flagged(demo_project):
+    """C9: body text citing a section number that no heading produces."""
+    p = demo_project / "content.md"
+    text = p.read_text(encoding="utf-8")
+    marker = "工程地理位置见{{ref:fig:location}}，总体布置原则如下。"
+    assert marker in text, "fixture drift"
+    p.write_text(text.replace(marker, "详见 9.9 节，" + marker), encoding="utf-8")
+    _build(demo_project)
+
+    class Args:
+        project_path = str(demo_project)
+        json = True
+
+    try:
+        doc_checker.cmd_check(Args)
+    except SystemExit:
+        pass  # advisory does not fail the gate
+    report = json.loads((demo_project / "check_report.json").read_text(encoding="utf-8"))
+    c9 = [x for x in report["findings"] if x["rule"] == "C9"]
+    assert c9 and c9[0]["level"] == "advisory", report["findings"]
+
+
+def test_good_cross_reference_is_not_flagged(demo_project):
+    """The demo's own cross-references must not produce C9 noise."""
+    _build(demo_project)
+
+    class Args:
+        project_path = str(demo_project)
+        json = True
+
+    try:
+        doc_checker.cmd_check(Args)
+    except SystemExit:
+        pass
+    report = json.loads((demo_project / "check_report.json").read_text(encoding="utf-8"))
+    assert not [x for x in report["findings"] if x["rule"] == "C9"], report["findings"]
