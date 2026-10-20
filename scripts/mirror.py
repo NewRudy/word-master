@@ -154,6 +154,13 @@ def mirror_atomgit(token, cwd):
     status, repo = api(f"{base}/repos/{owner}/{NAME}", token, **AUTH)
     if status == 200:
         print(f"  AtomGit 仓库已存在: {repo.get('html_url')}")
+        # AtomGit 的 PATCH 要求一组必填字段，缺一个就是 400 且不说明缺哪个
+        payload = {"name": NAME, "description": DESCRIPTION, "public": True,
+                   "private": False, "default_branch": "main",
+                   "visibility": "public", "issues_enabled": True,
+                   "wiki_enabled": False, "jobs_enabled": False}
+        st, _ = api(f"{base}/repos/{owner}/{NAME}", token, "PATCH", payload, **AUTH)
+        print(f"  AtomGit 描述: {'ok' if st == 200 else f'skipped ({st})'}")
     else:
         status, repo = api(f"{base}/user/repos", token, "POST", {
             "name": NAME,
